@@ -20,7 +20,7 @@
         <Grid Name="GridSetting1" Visibility="{Binding Path=SettingChecked,Converter={StaticResource SettingVisibilityConverter},
                      ConverterParameter={x:Static local:SettingEnum.One}}">
             <Slider HorizontalAlignment="Left" Margin="241,128,0,0" VerticalAlignment="Top" Width="241"
-                    Value="{Binding Colors1}"/>
+                    Value="{Binding Colors1}" />
             <Slider HorizontalAlignment="Left" Margin="241,174,0,0" VerticalAlignment="Top" Width="241"
                     Value="{Binding Gamma1}"/>
             <Slider HorizontalAlignment="Left" Margin="241,217,0,0" VerticalAlignment="Top" Width="241"

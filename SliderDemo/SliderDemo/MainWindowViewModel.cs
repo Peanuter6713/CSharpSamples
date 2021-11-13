@@ -1,5 +1,12 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SliderDemo.Helper;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace SliderDemo
 {
@@ -12,6 +19,9 @@ namespace SliderDemo
     class MainWindowViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        //public event RoutedPropertyChangedEventHandler<double> SliderValueChanged;
+
 
         private SettingEnum settingChecked;
         public SettingEnum SettingChecked
@@ -98,7 +108,56 @@ namespace SliderDemo
 
         public MainWindowViewModel()
         {
-            this.SettingChecked = SettingEnum.Two;
+            if (!File.Exists(FileHelper.DefaultFilePath))
+            {
+                FileHelper.CreateFile(FileHelper.DefaultFilePath);
+                DefaultInit();
+            }
+            else
+            {
+                ReadFile(FileHelper.DefaultFilePath);
+            }
+
+            //this.SettingChecked = SettingEnum.Two;
+            //this.SliderValueChanged += Show;
+        }
+ 
+        private void DefaultInit()
+        {
+            this.SettingChecked = SettingEnum.One;
+            this.Colors1 = 1;
+            this.Gamma1 = 1;
+            this.Brightness1 = 1;
+            this.Colors2 = 2;
+            this.Gamma2 = 2;
+            this.Brightness2 = 2;
+        }
+
+        private void ReadFile(string file)
+        {
+            try
+            {
+                JObject jObject = null;
+                using (StreamReader streamReader = File.OpenText(file))
+                {
+                    using(JsonTextReader jsonTextReader = new JsonTextReader(streamReader))
+                    {
+                        jObject = (JObject)JToken.ReadFrom(jsonTextReader);
+                    }
+                }
+
+                this.SettingChecked = (SettingEnum)(int)jObject[FileHelper.SettingType];
+                this.Colors1 = (double)jObject[FileHelper.Color1];
+                this.Gamma1 = (double)jObject[FileHelper.Gamma1];
+                this.Brightness1 = (double)jObject[FileHelper.Brightness1];
+                this.Colors2 = (double)jObject[FileHelper.Color2];
+                this.Gamma2 = (double)jObject[FileHelper.Gamma2];
+                this.Brightness2 = (double)jObject[FileHelper.Brightness2];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void RaisePropertyChanged([CallerMemberName] string property = null)
