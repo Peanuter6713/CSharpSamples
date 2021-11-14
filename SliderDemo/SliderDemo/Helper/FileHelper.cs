@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,15 @@ namespace SliderDemo.Helper
     class FileHelper
     {
         public const string DefaultFilePath = "E:\\ColorAdjust.json";
+        //public static string DefaultFilePath
+        //{
+        //    get
+        //    {
+        //        var filePath = ConfigurationManager.AppSettings["DefaultFilePath"];
+        //        return filePath ?? "E:\\ColorAdjust.json";
+        //    }
+        //}
+
         public const string SettingType = "SettingType";
         public const string Color1 = "Color1";
         public const string Gamma1 = "Gamma1";
@@ -50,11 +60,7 @@ namespace SliderDemo.Helper
             }
         }
 
-       
-        public static void ReadFile()
-        {
 
-        }
 
     }
 }
