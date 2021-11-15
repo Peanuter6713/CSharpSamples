@@ -20,11 +20,11 @@ namespace SliderDemo
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainWindowViewModel viewModel = new MainWindowViewModel();
+       // MainWindowViewModel viewModel = new MainWindowViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = viewModel;
+            //this.DataContext = viewModel;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
     }
