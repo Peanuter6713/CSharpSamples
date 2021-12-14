@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
+using XieCheng.Models;
+using XieCheng.ResourceParameters;
 using XieCheng.Services;
 
 namespace XieCheng.Controllers
@@ -24,40 +26,40 @@ namespace XieCheng.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTouristRoutes()
+        public IActionResult GetTouristRoutes(
+            //string keyword
+            [FromQuery] TouristRouteResourceParameters parameters
+            )
         {
-            var routes = _touristRouteRepository.GetTouristRoutes();
+            var routes = _touristRouteRepository.GetTouristRoutes(parameters.Keyword, parameters.RatingOperator, parameters.RatingValue);
             var routesDtos = _mapper.Map<IEnumerable<TouristRouteDto>>(routes);
 
             return Ok(routesDtos);
         }
 
-        [HttpGet("{touristId:Guid}")]
+        [HttpGet("{touristId:Guid}", Name = "GetTouristRouteById")]
         public IActionResult GetTouristRouteById(Guid touristId)
         {
             var routes = _touristRouteRepository.GetTouristRoute(touristId);
 
-            //var touristRouteDto = new TouristRouteDto()
-            //{
-            //    Id = routes.Id,
-            //    Title = routes.Title,
-            //    Description = routes.Description,
-            //    Price = routes.OriginalPrice * (decimal)routes.DiscountPresent,
-            //    CreateTime = routes.CreateTime,
-            //    UpdateTime = routes.UpdateTime,
-            //    DepartureTime = routes.DepartureTime,
-            //    Features = routes.Features,
-            //    Fees = routes.Fees,
-            //    Notes = routes.Notes,
-            //    Rating = routes.Rating,
-            //    TravelDays = routes.TravelDays.ToString(),
-            //    TripType = routes.TripType.ToString(),
-            //    DepartureCity = routes.DepartureCity.ToString()
-            //};
             var touristRouteDto = _mapper.Map<TouristRouteDto>(routes);
 
             return Ok(touristRouteDto);
         }
+
+        [HttpPost]
+        public IActionResult CreateTouristRoute([FromBody] TouristRouteForCreationDto touristRouteForCreationDto)
+        {
+            var model = _mapper.Map<TouristRoute>(touristRouteForCreationDto);
+
+            _touristRouteRepository.AddTouristRoute(model);
+            _touristRouteRepository.Save();
+
+            var returnModel = _mapper.Map<TouristRouteDto>(model);
+
+            return CreatedAtRoute("GetTouristRouteById", new { touristId = returnModel.Id }, returnModel);
+        }
+
 
     }
 }

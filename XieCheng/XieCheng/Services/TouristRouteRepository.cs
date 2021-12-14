@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XieCheng.DataBase;
+using XieCheng.DtoS;
 using XieCheng.Models;
 
 namespace XieCheng.Services
@@ -16,10 +18,46 @@ namespace XieCheng.Services
             dbContext = context;
         }
 
-
         public TouristRoute GetTouristRoute(Guid touristRouteId)
         {
-            return dbContext.TouristRoutes.FirstOrDefault(a => a.Id.Equals(touristRouteId));
+            return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefault(a => a.Id.Equals(touristRouteId));
+        }
+
+        public IEnumerable<TouristRoute> GetTouristRoutes(string keyword, string ratingOperator, int? ratingValue)
+        {
+            // Include VS join  连接两张表
+            //return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
+
+            IQueryable<TouristRoute> result = dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.Trim();
+                result = result.Where(t => t.Title.Contains(keyword));
+            }
+
+            if (ratingValue >= 0)
+            {
+                switch (ratingOperator)
+                {
+                    case "largerThan":
+                        result = result.Where(t => t.Rating > ratingValue);
+                        break;
+                    case "lessThan":
+                        result = result.Where(t => t.Rating < ratingValue);
+                        break;
+                    default:
+                        result = result.Where(t => t.Rating == ratingValue);
+                        break;
+                }
+            }
+
+            return result.ToList();
+        }
+
+        public bool TouristRouteExists(Guid touristRouteId)
+        {
+            return dbContext.TouristRoutes.Any(t => t.Id == touristRouteId);
         }
 
         public IEnumerable<TouristRoutePicture> GetTouristRoutePictures(Guid touristRouteId)
@@ -27,14 +65,41 @@ namespace XieCheng.Services
             return dbContext.TouristRoutePictures.Where(t => t.TouristRouteId == touristRouteId).ToList();
         }
 
-        public IEnumerable<TouristRoute> GetTouristRoutes()
+        public TouristRoutePicture GetPicture(int pictureId)
         {
-            return dbContext.TouristRoutes;
+            return dbContext.TouristRoutePictures.FirstOrDefault(p => p.Id == pictureId);
         }
 
-        public bool TouristRouteExists(Guid touristRouteId)
+        public void AddTouristRoute(TouristRoute touristRoute)
         {
-            return dbContext.TouristRoutes.Any(t => t.Id == touristRouteId);
+            if (touristRoute == null)
+            {
+                throw new ArgumentNullException(nameof(TouristRoute));
+            }
+
+            dbContext.TouristRoutes.Add(touristRoute);
+        }
+
+        public void AddTouristRoutePicture(Guid touristRouteId, TouristRoutePicture touristRoutePicture)
+        {
+            if (touristRouteId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(touristRouteId));
+            }
+
+            if (touristRoutePicture == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoutePicture));
+            }
+
+            touristRoutePicture.TouristRouteId = touristRouteId;
+            dbContext.TouristRoutePictures.Add(touristRoutePicture);
+            dbContext.SaveChanges();
+        }
+
+        public bool Save()
+        {
+            return dbContext.SaveChanges() >= 0;
         }
 
     }

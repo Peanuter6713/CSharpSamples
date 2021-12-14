@@ -13,6 +13,7 @@ namespace XieCheng.Profiles
         public TouristRoutePictureProfile()
         {
             CreateMap<TouristRoutePicture, TouristRoutePictureDto>();
+            CreateMap<TouristRoutePictureForCreationDto, TouristRoutePicture>();
         }
     }
 }

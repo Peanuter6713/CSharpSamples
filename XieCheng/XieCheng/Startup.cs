@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +36,28 @@ namespace XieCheng
                 //setupAction.OutputFormatters.Add(
                 //        new XmlDataContractSerializerOutputFormatter()
                 //    );
-            }).AddXmlDataContractSerializerFormatters(); // 接收 响应请求时，支持XML格式
+            })
+            .AddXmlDataContractSerializerFormatters() // 接收 响应请求时，支持XML格式
+            // 验证数据是否非法
+            .ConfigureApiBehaviorOptions(setupAction =>
+            {
+                setupAction.InvalidModelStateResponseFactory = context =>
+                {
+                    var problemDetail = new ValidationProblemDetails(context.ModelState)
+                    {
+                        Type = "都行",
+                        Title = "数据验证失败",
+                        Status = StatusCodes.Status422UnprocessableEntity,
+                        Detail = "请看详细说明",
+                        Instance = context.HttpContext.Request.Path
+                    };
+                    problemDetail.Extensions.Add("traceId", context.HttpContext.TraceIdentifier);
+                    return new UnprocessableEntityObjectResult(problemDetail)
+                    {
+                        ContentTypes = { "application/problem+json" }
+                    };
+                };
+            });
 
             services.AddTransient<ITouristRouteRepository, TouristRouteRepository>();
 
