@@ -11,7 +11,7 @@ namespace XieCheng.ValidationAttributes
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var touristRouteDto = validationContext.ObjectInstance as TouristRouteForCreationDto;
+            var touristRouteDto = (TouristRouteForManipulationDto)validationContext.ObjectInstance;
             
             if (touristRouteDto.Title == touristRouteDto.Description)
             {

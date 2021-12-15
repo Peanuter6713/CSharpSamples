@@ -61,5 +61,21 @@ namespace XieCheng.Controllers
         }
 
 
+        [HttpPut("{touristRouteId}")]
+        public IActionResult UpdateTouristRoute([FromRoute] Guid touristRouteId, [FromBody] TouristRouteForUpdateDto touristRouteForUpdateDto)
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("旅游路线不存在");
+            }
+
+            var touristRouteFromRepo = _touristRouteRepository.GetTouristRoute(touristRouteId);
+            //1. 映射DTO  2.更新DTO 3.映射model
+            _mapper.Map(touristRouteForUpdateDto, touristRouteFromRepo);
+            _touristRouteRepository.Save();
+
+            return NoContent();
+        }
+
     }
 }
