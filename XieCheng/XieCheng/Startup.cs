@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,12 @@ namespace XieCheng
                 //setupAction.OutputFormatters.Add(
                 //        new XmlDataContractSerializerOutputFormatter()
                 //    );
+            })
+            // 绑定JSONPatch 和 JSON 
+            .AddNewtonsoftJson(setupAction =>
+            {
+                // 配置框架
+                setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             })
             .AddXmlDataContractSerializerFormatters() // 接收 响应请求时，支持XML格式
             // 验证数据是否非法

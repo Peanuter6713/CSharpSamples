@@ -16,6 +16,8 @@ namespace XieCheng.Services
         TouristRoutePicture GetPicture(int pictureId);
         void AddTouristRoute(TouristRoute touristRoute);
         void AddTouristRoutePicture(Guid touristRouteId, TouristRoutePicture touristRoutePicture);
+        void DeleteTouristRoute(TouristRoute touristRoute);
+        void DeletePicture(TouristRoutePicture picture);
         bool Save();
     }
 }

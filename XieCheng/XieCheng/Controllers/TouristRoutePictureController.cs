@@ -77,5 +77,20 @@ namespace XieCheng.Controllers
             return CreatedAtRoute(nameof(GetPicture), new { touristRouteId = pictureModel.TouristRouteId, pictureId = pictureModel.Id }, pictureToReturn);
         }
 
+        [HttpDelete("pictureId")]
+        public IActionResult DeletePicture([FromRoute] Guid touristRouteId, [FromRoute] int pictureId)
+        {
+            if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
+            {
+                return NotFound("旅游路线不存在");
+            }
+
+            var picture = _touristRouteRepository.GetPicture(pictureId);
+            _touristRouteRepository.DeletePicture(picture);
+            _touristRouteRepository.Save();
+
+            return NoContent();
+        }
+
     }
 }

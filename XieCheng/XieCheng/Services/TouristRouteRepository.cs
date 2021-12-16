@@ -97,6 +97,26 @@ namespace XieCheng.Services
             dbContext.SaveChanges();
         }
 
+        public void DeleteTouristRoute(TouristRoute touristRoute)
+        {
+            if (touristRoute == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoute));
+            }
+
+            dbContext.TouristRoutes.Remove(touristRoute);
+        }
+
+        public void DeletePicture(TouristRoutePicture touristRoutePicture)
+        {
+            if (touristRoutePicture == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoutePicture));
+            }
+
+            dbContext.TouristRoutePictures.Remove(touristRoutePicture);
+        }
+
         public bool Save()
         {
             return dbContext.SaveChanges() >= 0;
