@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
+using XieCheng.Helper;
 using XieCheng.Models;
 using XieCheng.ResourceParameters;
 using XieCheng.Services;
@@ -113,9 +115,23 @@ namespace XieCheng.Controllers
             _touristRouteRepository.DeleteTouristRoute(touristRoute);
             _touristRouteRepository.Save();
 
-            return NoContent();
+            return NoContent(); 
         }
 
+        [HttpDelete("({ids})")]
+        public IActionResult DeleteByIDs([ModelBinder(BinderType =typeof(ArrayModelBinder))][FromRoute] IEnumerable<Guid> ids)
+        {
+            if (ids == null)
+            {
+                return BadRequest();
+            }
+
+            var touristRoutes = _touristRouteRepository.GetTouristRoutesByIDList(ids);
+            _touristRouteRepository.DeleteTouristRoutes(touristRoutes);
+            _touristRouteRepository.Save();
+
+            return NoContent();
+        }
 
 
     }

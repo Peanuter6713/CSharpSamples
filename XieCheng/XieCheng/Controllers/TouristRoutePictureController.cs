@@ -10,7 +10,8 @@ using XieCheng.Services;
 
 namespace XieCheng.Controllers
 {
-    [Route("api/touristRoutes/{touristRouteId}/pictures")]
+    [Route("api/[controller]")]
+    //[Route("api/touristRoutes/{touristRouteId}/pictures/{id}")]
     [ApiController]
     public class TouristRoutePictureController : ControllerBase
     {
@@ -77,7 +78,7 @@ namespace XieCheng.Controllers
             return CreatedAtRoute(nameof(GetPicture), new { touristRouteId = pictureModel.TouristRouteId, pictureId = pictureModel.Id }, pictureToReturn);
         }
 
-        [HttpDelete("pictureId")]
+        [HttpDelete("{touristRouteId}/{pictureId}")]
         public IActionResult DeletePicture([FromRoute] Guid touristRouteId, [FromRoute] int pictureId)
         {
             if (!_touristRouteRepository.TouristRouteExists(touristRouteId))

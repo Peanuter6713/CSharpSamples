@@ -86,6 +86,14 @@ namespace XieCheng
             {
                 app.UseDeveloperExceptionPage();
             }
+            // Make sure the CORS middleware is ahead of SignalR.
+            //app.UseCors(builder =>
+            //{
+            //    builder.WithOrigins("https://localhost")
+            //        .AllowAnyHeader()
+            //        .WithMethods("GET", "POST", "DELETE")
+            //        .AllowCredentials();
+            //});
 
             app.UseRouting();
 

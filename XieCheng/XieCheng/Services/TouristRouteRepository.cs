@@ -117,10 +117,24 @@ namespace XieCheng.Services
             dbContext.TouristRoutePictures.Remove(touristRoutePicture);
         }
 
+        public void DeleteTouristRoutes(IEnumerable<TouristRoute> touristRoutes)
+        {
+            if (touristRoutes == null)
+            {
+                throw new ArgumentNullException(nameof(touristRoutes));
+            }
+
+            dbContext.TouristRoutes.RemoveRange(touristRoutes);
+        }
+
+        public IEnumerable<TouristRoute> GetTouristRoutesByIDList(IEnumerable<Guid> ids)
+        {
+            return dbContext.TouristRoutes.Where(t => ids.Contains(t.Id)).ToList();
+        }
+
         public bool Save()
         {
             return dbContext.SaveChanges() >= 0;
         }
-
     }
 }
