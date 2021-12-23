@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,28 +19,54 @@ namespace XieCheng.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly IConfiguration configuration;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
 
-        public AuthenticateController(IConfiguration configuration)
+        public AuthenticateController(IConfiguration configuration, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             this.configuration = configuration;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
+
 
         [AllowAnonymous]
         [Route("login")]
-        public IActionResult Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             // 验证用户名和密码
+            var loginResult = await signInManager.PasswordSignInAsync(
+                loginDto.Email,
+                loginDto.Password,
+                false,
+                false
+                );
+
+            if (!loginResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            var user = await userManager.FindByNameAsync(loginDto.Email);
 
             // create jwt
             // header
             var signingAlgorithm = SecurityAlgorithms.HmacSha256;
             // payload
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 // sub
-                new Claim(JwtRegisteredClaimNames.Sub, "fake-used-id"),
-                new Claim(ClaimTypes.Role, "Admin")
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                //new Claim(ClaimTypes.Role, "Admin")
             };
+
+            var roleNames = await userManager.GetRolesAsync(user);
+            foreach (var roleName in roleNames)
+            {
+                var roleClaim = new Claim(ClaimTypes.Role, roleName);
+                claims.Add(roleClaim);
+            }
+
             // signature  SecretKey 需足够长、复杂
             var secretByte = Encoding.UTF8.GetBytes(configuration["Authentication:SecretKey"]);
             var signingKey = new SymmetricSecurityKey(secretByte);
@@ -61,6 +88,23 @@ namespace XieCheng.Controllers
 
             // return 200 OK + jwt
             return Ok(tokenStr);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            // 1. 使用用户名创建用户对象
+            var user = new IdentityUser()
+            {
+                UserName = registerDto.Email,
+                Email = registerDto.Email
+            };
+            // 2. hash密码，保存用户
+            var result = await userManager.CreateAsync(user, registerDto.Password);
+            // 3. return
+
+            return result.Succeeded ? Ok() : BadRequest();
         }
 
     }

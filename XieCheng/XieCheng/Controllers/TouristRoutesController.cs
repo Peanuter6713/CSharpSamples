@@ -160,7 +160,8 @@ namespace XieCheng.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTouristRoute([FromBody] TouristRouteForCreationDto touristRouteForCreationDto)
         {
             var model = _mapper.Map<TouristRoute>(touristRouteForCreationDto);
