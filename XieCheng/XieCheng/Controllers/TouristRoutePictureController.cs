@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace XieCheng.Controllers
     [Route("api/[controller]")]
     //[Route("api/touristRoutes/{touristRouteId}/pictures/{id}")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class TouristRoutePictureController : ControllerBase
     {
         private readonly ITouristRouteRepository _touristRouteRepository;

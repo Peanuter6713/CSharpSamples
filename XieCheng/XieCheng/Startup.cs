@@ -18,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XieCheng.DataBase;
+using XieCheng.Models;
 using XieCheng.Services;
 
 namespace XieCheng
@@ -35,7 +36,7 @@ namespace XieCheng
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -96,8 +97,8 @@ namespace XieCheng
             services.AddDbContext<AppDbContext>(option =>
             {
                 //option.UseSqlServer(connectionString);
-                //option.UseSqlServer(Configuration["DbContext:SqlServerConnectionString"]);
-                option.UseMySql(Configuration["DbContext:MySqlConnectionString"], ServerVersion.AutoDetect(Configuration["DbContext:MySqlConnectionString"]));
+                option.UseSqlServer(Configuration["DbContext:SqlServerConnectionString"]);
+                //option.UseMySql(Configuration["DbContext:MySqlConnectionString"], ServerVersion.AutoDetect(Configuration["DbContext:MySqlConnectionString"]));
             });
 
             // É¨Ãè profile ÎÄ¼þ

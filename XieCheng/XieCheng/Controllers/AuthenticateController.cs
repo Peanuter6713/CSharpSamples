@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
+using XieCheng.Models;
 
 namespace XieCheng.Controllers
 {
@@ -19,10 +20,10 @@ namespace XieCheng.Controllers
     public class AuthenticateController : ControllerBase
     {
         private readonly IConfiguration configuration;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
 
-        public AuthenticateController(IConfiguration configuration, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AuthenticateController(IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             this.configuration = configuration;
             this.userManager = userManager;
@@ -95,7 +96,7 @@ namespace XieCheng.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             // 1. 使用用户名创建用户对象
-            var user = new IdentityUser()
+            var user = new ApplicationUser()
             {
                 UserName = registerDto.Email,
                 Email = registerDto.Email

@@ -18,6 +18,7 @@ namespace XieCheng.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class TouristRoutesController : ControllerBase
     {
         private readonly ITouristRouteRepository _touristRouteRepository;
