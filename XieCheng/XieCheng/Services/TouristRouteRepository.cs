@@ -189,6 +189,39 @@ namespace XieCheng.Services
             return await dbContext.TouristRoutes.Where(t => ids.Contains(t.Id)).ToListAsync();
         }
 
+        public async Task<ShoppingCart> GetShoppingCartByUserIdAsync(string userId)
+        {
+            return await dbContext.ShoppingCarts
+                // ShoppingCart Table join ApplicationUser Table
+                .Include(s => s.User)
+                // ShoppingCart Table
+                .Include(s => s.ShoppingCartItems)
+                // LineItem Table
+                .ThenInclude(line => line.TouristRoute) 
+                .Where(s => s.UserId == userId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task CreateShoppingCartAsync(ShoppingCart shoppingCart)
+        {
+            await dbContext.ShoppingCarts.AddAsync(shoppingCart);
+        }
+
+        public async Task AddShoppingCartItemAsync(LineItem lineItem)
+        {
+            await dbContext.LineItems.AddAsync(lineItem);
+        }
+
+        public async Task<LineItem> GetShoppingCartItemByItemIdAsync(int lineItemId)
+        {
+            return await dbContext.LineItems.FirstOrDefaultAsync(li => li.Id == lineItemId);
+        }
+
+        public void DeleteShoppingCartItem(LineItem lineItem)
+        {
+            dbContext.LineItems.Remove(lineItem);
+        }
+
         public bool Save()
         {
             return dbContext.SaveChanges() >= 0;
@@ -198,5 +231,14 @@ namespace XieCheng.Services
             return await dbContext.SaveChangesAsync() >= 0;
         }
 
+        public async Task<IEnumerable<LineItem>> GetShoppingCartsByIdListAsync(IEnumerable<int> ids)
+        {
+            return await dbContext.LineItems.Where(li => ids.Contains(li.Id)).ToListAsync();
+        }
+
+        public void DeleteShoppingCartItems(IEnumerable<LineItem> lineItems)
+        {
+            dbContext.LineItems.RemoveRange(lineItems);
+        }
     }
 }

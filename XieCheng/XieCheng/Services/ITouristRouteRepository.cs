@@ -26,6 +26,13 @@ namespace XieCheng.Services
         void DeletePicture(TouristRoutePicture picture);
         IEnumerable<TouristRoute> GetTouristRoutesByIDList(IEnumerable<Guid> touristRouteIds);
         Task<IEnumerable<TouristRoute>> GetTouristRoutesByIDListAsync(IEnumerable<Guid> touristRouteIds);
+        Task<ShoppingCart> GetShoppingCartByUserIdAsync(string userId);
+        Task CreateShoppingCartAsync(ShoppingCart shoppingCart);
+        Task AddShoppingCartItemAsync(LineItem lineItem);
+        Task<LineItem> GetShoppingCartItemByItemIdAsync(int lineItemId);
+        void DeleteShoppingCartItem(LineItem lineItem);
+        Task<IEnumerable<LineItem>> GetShoppingCartsByIdListAsync(IEnumerable<int> ids);
+        void DeleteShoppingCartItems(IEnumerable<LineItem> lineItems);
         bool Save();
         Task<bool> SaveAsync();
     }

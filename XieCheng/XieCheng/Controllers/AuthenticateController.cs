@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
 using XieCheng.Models;
+using XieCheng.Services;
 
 namespace XieCheng.Controllers
 {
@@ -22,12 +23,14 @@ namespace XieCheng.Controllers
         private readonly IConfiguration configuration;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ITouristRouteRepository touristRouteRepository;
 
-        public AuthenticateController(IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AuthenticateController(IConfiguration configuration, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITouristRouteRepository touristRouteRepository)
         {
             this.configuration = configuration;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.touristRouteRepository = touristRouteRepository;
         }
 
 
@@ -101,10 +104,20 @@ namespace XieCheng.Controllers
                 UserName = registerDto.Email,
                 Email = registerDto.Email
             };
+
             // 2. hash密码，保存用户
             var result = await userManager.CreateAsync(user, registerDto.Password);
-            // 3. return
 
+            // 3. Initialize Shopping Cart
+            var shoppingCart = new ShoppingCart()
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id
+            };
+            await this.touristRouteRepository.CreateShoppingCartAsync(shoppingCart);
+            await this.touristRouteRepository.SaveAsync();
+
+            // 4. return
             return result.Succeeded ? Ok() : BadRequest();
         }
 
