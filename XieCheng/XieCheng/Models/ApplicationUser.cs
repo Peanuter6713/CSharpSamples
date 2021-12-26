@@ -10,6 +10,7 @@ namespace XieCheng.Models
     {
         public string Address { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
+        public ICollection<Order> Orders { get; set; }
 
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; }
         public virtual ICollection<IdentityUserClaim<string>> Claims { get; set; }

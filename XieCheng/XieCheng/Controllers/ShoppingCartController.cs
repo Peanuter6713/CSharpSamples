@@ -108,5 +108,34 @@ namespace XieCheng.Controllers
             return NoContent();
         }
 
+
+        [HttpPost("checkout")]
+        public async Task<IActionResult> CheckOut()
+        {
+            // 1. Gets the current user id.
+            var userId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            // 2. Gets shopping cart by UserId
+            var shoppingCart = await touristRouteRepository.GetShoppingCartByUserIdAsync(userId);
+
+            // 3. Create order
+            var order = new Order()
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                State = OrderStateEnum.Pending,
+                OrderItems = shoppingCart.ShoppingCartItems,
+                CreateDateUTC = DateTime.UtcNow
+            };
+
+            // 清空购物车
+            shoppingCart.ShoppingCartItems = null;
+
+            await this.touristRouteRepository.AddOrderAsync(order);
+            await this.touristRouteRepository.SaveAsync();
+
+            return Ok(mapper.Map<OrderDto>(order));
+        }
+
     }
 }

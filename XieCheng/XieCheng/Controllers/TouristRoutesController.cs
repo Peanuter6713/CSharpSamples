@@ -144,7 +144,13 @@ namespace XieCheng.Controllers
             [FromQuery] TouristRouteResourceParameters parameters
             )
         {
-            var routes = await _touristRouteRepository.GetTouristRoutesAsync(parameters.Keyword, parameters.RatingOperator, parameters.RatingValue);
+            var routes = await _touristRouteRepository.GetTouristRoutesAsync(
+                parameters.Keyword,
+                parameters.RatingOperator,
+                parameters.RatingValue,
+                parameters.PageSize,
+                parameters.PageNumber
+                );
             var routesDtos = _mapper.Map<IEnumerable<TouristRouteDto>>(routes);
 
             return Ok(routesDtos);

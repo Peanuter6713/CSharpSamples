@@ -103,6 +103,9 @@ namespace XieCheng
 
             // 扫描 profile 文件
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            // 注册Http请求服务 用户模拟第三方支付
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

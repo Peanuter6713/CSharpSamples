@@ -28,6 +28,44 @@ namespace XieCheng.Services
             return await dbContext.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefaultAsync(a => a.Id.Equals(touristRouteId));
         }
 
+        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue,int pageSize, int pageNumber)
+        {
+            // Include VS join  连接两张表
+            //return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
+
+            IQueryable<TouristRoute> result = dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.Trim();
+                result = result.Where(t => t.Title.Contains(keyword));
+            }
+
+            if (ratingValue >= 0)
+            {
+                switch (ratingOperator)
+                {
+                    case "largerThan":
+                        result = result.Where(t => t.Rating > ratingValue);
+                        break;
+                    case "lessThan":
+                        result = result.Where(t => t.Rating < ratingValue);
+                        break;
+                    default:
+                        result = result.Where(t => t.Rating == ratingValue);
+                        break;
+                }
+            }
+
+            // pagination
+            // skip
+            var skip = (pageNumber - 1) * pageSize;
+            result = result.Skip(skip);
+            result = result.Take(pageSize);
+
+            return await result.ToListAsync();
+        }
+
         public IEnumerable<TouristRoute> GetTouristRoutes(string keyword, string ratingOperator, int? ratingValue)
         {
             // Include VS join  连接两张表
@@ -58,38 +96,6 @@ namespace XieCheng.Services
             }
 
             return result.ToList();
-        }
-
-        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue)
-        {
-            // Include VS join  连接两张表
-            //return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
-
-            IQueryable<TouristRoute> result = dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                keyword = keyword.Trim();
-                result = result.Where(t => t.Title.Contains(keyword));
-            }
-
-            if (ratingValue >= 0)
-            {
-                switch (ratingOperator)
-                {
-                    case "largerThan":
-                        result = result.Where(t => t.Rating > ratingValue);
-                        break;
-                    case "lessThan":
-                        result = result.Where(t => t.Rating < ratingValue);
-                        break;
-                    default:
-                        result = result.Where(t => t.Rating == ratingValue);
-                        break;
-                }
-            }
-
-            return await result.ToListAsync();
         }
 
         public bool TouristRouteExists(Guid touristRouteId)
@@ -239,6 +245,23 @@ namespace XieCheng.Services
         public void DeleteShoppingCartItems(IEnumerable<LineItem> lineItems)
         {
             dbContext.LineItems.RemoveRange(lineItems);
+        }
+
+        public async Task AddOrderAsync(Order order)
+        {
+            await dbContext.AddAsync(order);
+        }
+
+        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId)
+        {
+            return await dbContext.Orders.Where(o => o.UserId == userId).ToListAsync();
+        }
+
+        public async Task<Order> GetOrderByIdAsync(Guid orderId)
+        {
+            //return await dbContext.Orders.FirstOrDefaultAsync(o => o.Id == orderId);
+            return await dbContext.Orders.Include(o => o.OrderItems).ThenInclude(oi => oi.TouristRoute)
+                .Where(o => o.Id == orderId).FirstOrDefaultAsync();
         }
     }
 }
