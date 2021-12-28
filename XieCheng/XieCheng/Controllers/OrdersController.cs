@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
+using XieCheng.ResourceParameters;
 using XieCheng.Services;
 
 namespace XieCheng.Controllers
@@ -38,15 +39,15 @@ namespace XieCheng.Controllers
 
         [HttpGet]
         [Authorize(AuthenticationSchemes ="Bearer")]
-        public async Task<IActionResult> GetOrders()
+        public async Task<IActionResult> GetOrders([FromQuery] PaginationResourceParameters parameters)
         {
-            // 1. Gets the current user id.
+            // 1. Gets the current user id. 
             var userId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             // 2. Gets shopping cart by UserId
             var shoppingCart = await touristRouteRepository.GetShoppingCartByUserIdAsync(userId);
 
-            var orders = await this.touristRouteRepository.GetOrdersByUserIdAsync(userId);
+            var orders = await this.touristRouteRepository.GetOrdersByUserIdAsync(userId, parameters.PageNumber, parameters.PageSize);
 
             return Ok(mapper.Map<IEnumerable<OrderDto>>(orders));
         }

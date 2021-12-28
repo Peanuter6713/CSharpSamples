@@ -137,19 +137,26 @@ namespace XieCheng.Controllers
         //}
         #endregion
 
+        private string GenerateTouristRouteResourceURL()
+        {
+
+        }
+
         #region Asynchronic ActionResult
-        [HttpGet]
+        [HttpGet(Name = "GetTouristRoutes")]
+        [HttpHead]
         public async Task<IActionResult> GetTouristRoutes(
             //string keyword
-            [FromQuery] TouristRouteResourceParameters parameters
+            [FromQuery] TouristRouteResourceParameters parameters,
+            [FromQuery] PaginationResourceParameters paginationParameters
             )
         {
             var routes = await _touristRouteRepository.GetTouristRoutesAsync(
                 parameters.Keyword,
                 parameters.RatingOperator,
                 parameters.RatingValue,
-                parameters.PageSize,
-                parameters.PageNumber
+                paginationParameters.PageSize,
+                paginationParameters.PageNumber
                 );
             var routesDtos = _mapper.Map<IEnumerable<TouristRouteDto>>(routes);
 

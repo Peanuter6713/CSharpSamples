@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using XieCheng.DataBase;
 using XieCheng.DtoS;
+using XieCheng.Helper;
 using XieCheng.Models;
 
 namespace XieCheng.Services
@@ -28,7 +29,7 @@ namespace XieCheng.Services
             return await dbContext.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefaultAsync(a => a.Id.Equals(touristRouteId));
         }
 
-        public async Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue,int pageSize, int pageNumber)
+        public async Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue,int pageSize, int pageNumber)
         {
             // Include VS join  连接两张表
             //return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
@@ -57,13 +58,8 @@ namespace XieCheng.Services
                 }
             }
 
-            // pagination
-            // skip
-            var skip = (pageNumber - 1) * pageSize;
-            result = result.Skip(skip);
-            result = result.Take(pageSize);
 
-            return await result.ToListAsync();
+            return await PaginationList<TouristRoute>.CreateAsync(pageNumber, pageSize, result);
         }
 
         public IEnumerable<TouristRoute> GetTouristRoutes(string keyword, string ratingOperator, int? ratingValue)
@@ -252,9 +248,11 @@ namespace XieCheng.Services
             await dbContext.AddAsync(order);
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId)
+        public async Task<PaginationList<Order>> GetOrdersByUserIdAsync(string userId, int pageNumber, int pageSize)
         {
-            return await dbContext.Orders.Where(o => o.UserId == userId).ToListAsync();
+            //return await dbContext.Orders.Where(o => o.UserId == userId).ToListAsync();
+            IQueryable<Order> result = dbContext.Orders.Where(o => o.UserId == userId);
+            return await PaginationList<Order>.CreateAsync(pageNumber, pageSize, result);
         }
 
         public async Task<Order> GetOrderByIdAsync(Guid orderId)

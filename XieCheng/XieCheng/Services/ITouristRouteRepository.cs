@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XieCheng.DtoS;
+using XieCheng.Helper;
 using XieCheng.Models;
 
 namespace XieCheng.Services
@@ -10,7 +11,7 @@ namespace XieCheng.Services
     public interface ITouristRouteRepository
     {
         IEnumerable<TouristRoute> GetTouristRoutes(string keyword, string ratingOperator, int? ratingValue);
-        Task<IEnumerable<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue, int pageSize, int pageNumber);
+        Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue, int pageSize, int pageNumber);
         TouristRoute GetTouristRoute(Guid touristRouteId);
         Task<TouristRoute> GetTouristRouteAsync(Guid touristRouteId);
         bool TouristRouteExists(Guid touristRouteId);
@@ -34,7 +35,7 @@ namespace XieCheng.Services
         Task<IEnumerable<LineItem>> GetShoppingCartsByIdListAsync(IEnumerable<int> ids);
         void DeleteShoppingCartItems(IEnumerable<LineItem> lineItems);
         Task AddOrderAsync(Order order);
-        Task<IEnumerable<Order>> GetOrdersByUserIdAsync(string userId);
+        Task<PaginationList<Order>> GetOrdersByUserIdAsync(string userId, int pageNumber, int pageSize);
         Task<Order> GetOrderByIdAsync(Guid orderId);
         bool Save();
         Task<bool> SaveAsync();
