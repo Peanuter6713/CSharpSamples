@@ -27,14 +27,17 @@ namespace XieCheng.Controllers
         private readonly ITouristRouteRepository _touristRouteRepository;
         private readonly IMapper _mapper;
         private readonly IUrlHelper _urlHepler;
+        private readonly IPropertyMappingService _propertyMappingService;
 
         public TouristRoutesController(ITouristRouteRepository touristRouteRepository, IMapper mapper,
             IUrlHelperFactory urlHelperFactory,
-            IActionContextAccessor actionContextAccessor)
+            IActionContextAccessor actionContextAccessor,
+            IPropertyMappingService propertyMappingService)
         {
             _touristRouteRepository = touristRouteRepository;
             _mapper = mapper;
             _urlHepler = urlHelperFactory.GetUrlHelper(actionContextAccessor.ActionContext);
+            _propertyMappingService = propertyMappingService;
         }
 
         #region Synchronic ActionResult
@@ -154,6 +157,8 @@ namespace XieCheng.Controllers
                 ResourceUriType.PreviousPage => _urlHepler.Link("GetTouristRoutes",
                 new
                 {
+                    fields = parameters.Fields,
+                    orderBy = parameters.OrderBy,
                     keyword = parameters.Keyword,
                     rating = parameters.Rating,
                     pageNumber = paginationParameters.PageNumber,
@@ -162,6 +167,8 @@ namespace XieCheng.Controllers
                 ResourceUriType.NextPage => _urlHepler.Link("GetTouristRoutes", 
                 new
                 {
+                    fields = parameters.Fields,
+                    orderBy = parameters.OrderBy,
                     keyword = parameters.Keyword,
                     rating = parameters.Rating,
                     pageNumber = paginationParameters.PageNumber + 1,
@@ -170,6 +177,8 @@ namespace XieCheng.Controllers
                 _ => _urlHepler.Link("GetTouristRoutes",
                 new
                 {
+                    fields = parameters.Fields,
+                    orderBy = parameters.OrderBy,
                     keyword = parameters.Keyword,
                     rating = parameters.Rating,
                     pageNumber = paginationParameters.PageNumber,
@@ -187,12 +196,23 @@ namespace XieCheng.Controllers
             [FromQuery] PaginationResourceParameters paginationParameters
             )
         {
+            if (!_propertyMappingService.IsMappingExists<TouristRouteDto, TouristRoute>(parameters.OrderBy))
+            {
+                return BadRequest("请输入正确的排序参数");
+            }
+
+            if (!_propertyMappingService.IsPropertiesExists<TouristRouteDto>(parameters.Fields))
+            {
+                return BadRequest("请输入正确的塑形参数");
+            }
+
             var routes = await _touristRouteRepository.GetTouristRoutesAsync(
                 parameters.Keyword,
                 parameters.RatingOperator,
                 parameters.RatingValue,
                 paginationParameters.PageSize,
-                paginationParameters.PageNumber
+                paginationParameters.PageNumber,
+                parameters.OrderBy
                 );
             var routesDtos = _mapper.Map<IEnumerable<TouristRouteDto>>(routes);
 
@@ -213,17 +233,17 @@ namespace XieCheng.Controllers
 
             Response.Headers.Add("x-pagination", JsonConvert.SerializeObject(paginationMetaData));
 
-            return Ok(routesDtos);
+            return Ok(routesDtos.ShapeData(parameters.Fields));
         }
 
         [HttpGet("{touristId:Guid}", Name = "GetTouristRouteById")]
-        public async Task<IActionResult> GetTouristRouteById(Guid touristId)
+        public async Task<IActionResult> GetTouristRouteById(Guid touristId, string fields)
         {
             var routes = await _touristRouteRepository.GetTouristRouteAsync(touristId);
 
             var touristRouteDto = _mapper.Map<TouristRouteDto>(routes);
 
-            return Ok(touristRouteDto);
+            return Ok(touristRouteDto.ShapeData(fields));
         }
 
         [HttpPost]

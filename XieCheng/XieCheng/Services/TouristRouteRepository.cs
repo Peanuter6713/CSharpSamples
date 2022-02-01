@@ -13,10 +13,12 @@ namespace XieCheng.Services
     public class TouristRouteRepository : ITouristRouteRepository
     {
         private readonly AppDbContext dbContext;
+        private readonly IPropertyMappingService propertyMappingService;
 
-        public TouristRouteRepository(AppDbContext context)
+        public TouristRouteRepository(AppDbContext context, IPropertyMappingService propertyMappingService)
         {
-            dbContext = context;
+            this.dbContext = context;
+            this.propertyMappingService = propertyMappingService;
         }
 
         public TouristRoute GetTouristRoute(Guid touristRouteId)
@@ -29,7 +31,7 @@ namespace XieCheng.Services
             return await dbContext.TouristRoutes.Include(t => t.TouristRoutePictures).FirstOrDefaultAsync(a => a.Id.Equals(touristRouteId));
         }
 
-        public async Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue,int pageSize, int pageNumber)
+        public async Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue,int pageSize, int pageNumber, string orderBy)
         {
             // Include VS join  连接两张表
             //return dbContext.TouristRoutes.Include(t => t.TouristRoutePictures);
@@ -40,6 +42,13 @@ namespace XieCheng.Services
             {
                 keyword = keyword.Trim();
                 result = result.Where(t => t.Title.Contains(keyword));
+            }
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                var touristRouteMappingDictionary = this.propertyMappingService.GetPropertyMapping<TouristRouteDto, TouristRoute>();
+
+               result = result.ApplySort(orderBy, touristRouteMappingDictionary);
             }
 
             if (ratingValue >= 0)

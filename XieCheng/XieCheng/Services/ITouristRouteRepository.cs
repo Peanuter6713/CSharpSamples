@@ -11,7 +11,7 @@ namespace XieCheng.Services
     public interface ITouristRouteRepository
     {
         IEnumerable<TouristRoute> GetTouristRoutes(string keyword, string ratingOperator, int? ratingValue);
-        Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue, int pageSize, int pageNumber);
+        Task<PaginationList<TouristRoute>> GetTouristRoutesAsync(string keyword, string ratingOperator, int? ratingValue, int pageSize, int pageNumber, string orderBy);
         TouristRoute GetTouristRoute(Guid touristRouteId);
         Task<TouristRoute> GetTouristRouteAsync(Guid touristRouteId);
         bool TouristRouteExists(Guid touristRouteId);

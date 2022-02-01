@@ -8,35 +8,7 @@ namespace XieCheng.ResourceParameters
 {
     public class TouristRouteResourceParameters
     {
-        //private int pageNumber = 1;
-        //public int PageNumber
-        //{
-        //    get { return pageNumber; }
-        //    set
-        //    {
-        //        if (value >= 1)
-        //        {
-        //            pageNumber = value;
-        //        }
-        //    }
-        //}
-
-        //const int maxPageSize = 50;
-        //private int pageSize = 10;
-        //public int PageSize
-        //{
-        //    get
-        //    {
-        //        return pageSize;
-        //    }
-        //    set
-        //    {
-        //        if (value >= 1)
-        //        {
-        //            pageSize = (value > maxPageSize) ? maxPageSize : value;
-        //        }
-        //    }
-        //}
+        public string OrderBy { get; set; }
         public string Keyword { get; set; }
         public string RatingOperator { get; set; }
         public int? RatingValue { get; set; }
@@ -63,5 +35,7 @@ namespace XieCheng.ResourceParameters
                 this.rating = value; 
             }
         }
+
+        public string Fields { get; set; }
     }
 }
