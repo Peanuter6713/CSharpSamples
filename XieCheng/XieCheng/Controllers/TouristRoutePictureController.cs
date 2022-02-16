@@ -26,7 +26,7 @@ namespace XieCheng.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetPictureListForTouristRoute")]
         public IActionResult GetPictureListForTouristRoute(Guid touristRouteId)
         {
             if (!_touristRouteRepository.TouristRouteExists(touristRouteId))
@@ -63,7 +63,7 @@ namespace XieCheng.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost(Name = "CreateTouristPicture")]
         public IActionResult CreateTouristPicture([FromRoute] Guid touristRouteId, [FromBody] TouristRoutePictureForCreationDto touristPictureForCreationDto)
         {
             if (!_touristRouteRepository.TouristRouteExists(touristRouteId))

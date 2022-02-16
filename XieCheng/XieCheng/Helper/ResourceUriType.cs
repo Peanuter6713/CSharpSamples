@@ -8,6 +8,7 @@ namespace XieCheng.Helper
     public enum ResourceUriType
     {
         PreviousPage,
+        CurrentPage,
         NextPage
     }
 }
