@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -112,6 +113,11 @@ namespace XieCheng
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -129,6 +135,13 @@ namespace XieCheng
             //        .WithMethods("GET", "POST", "DELETE")
             //        .AllowCredentials();
             //});
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             // ÄãÔÚÄÄ£¿
             app.UseRouting();

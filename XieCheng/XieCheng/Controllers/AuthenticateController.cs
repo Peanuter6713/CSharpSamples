@@ -35,7 +35,7 @@ namespace XieCheng.Controllers
 
 
         [AllowAnonymous]
-        [Route("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             // 验证用户名和密码
