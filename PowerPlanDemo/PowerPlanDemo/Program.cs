@@ -20,11 +20,15 @@ namespace PowerPlanDemo
         public static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, ref IntPtr activePowerId);
         [DllImport("PowrProf.dll")]
         public static extern uint PowerEnumerate(IntPtr RootPowerKey, IntPtr SchemeGuid, IntPtr SubGroupOfPowerSettingGuid, uint AcessFlags, uint Index, ref Guid Buffer, ref uint BufferSize);
+        [DllImport("PowrProf.dll")]
+        public static extern uint PowerRestoreDefaultPowerSchemes();
 
 
         static void Main(string[] args)
         {
-            GetPowerScheme();
+            //GetPowerScheme();
+            var result = PowerRestoreDefaultPowerSchemes(); // 删除所有的电源计划，使用默认的电源计划
+            Console.WriteLine(result);
 
             Console.ReadLine();
         }
